@@ -1,0 +1,24 @@
+{
+  "name": "Photo Grid Overlay",
+  "short_name": "Photo Grid",
+  "description": "A simple, mobile-friendly web app for overlaying a grid on photos. Perfect for checking composition, alignment, and the rule of thirds in photography.",
+  "start_url": "./?source=pwa",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#007AFF",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
