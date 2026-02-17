@@ -1,11 +1,11 @@
 // Service Worker for Photo Grid Overlay
 const CACHE_NAME = 'photo-grid-v1';
 const urlsToCache = [
-  '/photo-grid/',
-  '/photo-grid/index.html',
-  '/photo-grid/manifest.json',
-  '/photo-grid/icon-192.png',
-  '/photo-grid/icon-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 // Install event - cache assets
@@ -17,7 +17,8 @@ self.addEventListener('install', (event) => {
         return cache.addAll(urlsToCache);
       })
       .catch((error) => {
-        console.log('Cache failed:', error);
+        console.error('Failed to cache assets during install:', error);
+        throw error; // Re-throw to fail the install and trigger retry
       })
   );
 });
@@ -34,12 +35,13 @@ self.addEventListener('fetch', (event) => {
 
         return fetch(event.request).then(
           (response) => {
-            // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
+            // Don't cache invalid responses
+            // Note: opaque responses (cross-origin without CORS) have ok=undefined, so check response exists and ok is not false
+            if (!response || response.ok === false) {
               return response;
             }
 
-            // Clone the response
+            // Clone the response for caching
             const responseToCache = response.clone();
 
             caches.open(CACHE_NAME)
@@ -49,7 +51,14 @@ self.addEventListener('fetch', (event) => {
 
             return response;
           }
-        );
+        ).catch((error) => {
+          console.error('Fetch failed; returning offline page:', error);
+          // Return a fallback response for navigation requests
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+          throw error;
+        });
       })
   );
 });
@@ -61,7 +70,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (!cacheWhitelist.includes(cacheName)) {
             return caches.delete(cacheName);
           }
         })
