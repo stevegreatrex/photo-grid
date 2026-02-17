@@ -241,6 +241,7 @@
         let lastTouches = [];
         let lastDistance = 0;
         let lastMidpoint = null;
+        let tapTimeout;
 
         // Initialize
         window.addEventListener('load', init);
@@ -268,7 +269,6 @@
             canvas.addEventListener('wheel', handleWheel, { passive: false });
 
             // Tap to toggle controls
-            let tapTimeout;
             canvas.addEventListener('click', () => {
                 clearTimeout(tapTimeout);
                 tapTimeout = setTimeout(() => {
@@ -288,12 +288,14 @@
 
         function openCamera() {
             const input = document.getElementById('file-input');
+            // Set capture='environment' to use the rear-facing camera on mobile devices
             input.setAttribute('capture', 'environment');
             input.click();
         }
 
         function openFileSelector() {
             const input = document.getElementById('file-input');
+            // Remove capture attribute to show standard file picker
             input.removeAttribute('capture');
             input.click();
         }
